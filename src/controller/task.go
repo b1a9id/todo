@@ -8,6 +8,8 @@ import (
 	"fmt"
 	"net/http"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 func TasksGET(c *gin.Context)  {
@@ -19,7 +21,7 @@ func TasksGET(c *gin.Context)  {
 	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	result, err := db.Query("SELECT * FROM task ORDER BY id DESC")
 	if err != nil {
 		panic(err.Error())
@@ -46,4 +48,31 @@ func TasksGET(c *gin.Context)  {
 	}
 	fmt.Println(tasks)
 	c.JSON(http.StatusOK, gin.H{"tasks": tasks})
+}
+
+func TaskPOST(c *gin.Context) {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	title := c.PostForm("title")
+	now := time.Now()
+
+	task := &model.Task{
+		Title: title,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	err2 := task.Save(db)
+	if err2 != nil {
+		panic(err2.Error())
+	}
+
+	fmt.Printf("post sent. title %s", title)
 }

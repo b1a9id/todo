@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
-	"time"
+	_ "time"
 )
 
 // XODB is the common interface for database operations that can be used with
