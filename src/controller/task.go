@@ -109,3 +109,28 @@ func TaskPATCH(c *gin.Context) {
 	fmt.Println(task)
 	c.JSON(http.StatusOK, gin.H{"task": task})
 }
+
+func TaskDELETE(c *gin.Context) {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	id, _ := strconv.Atoi(c.Param("id"))
+
+	task, err := model.TaskByID(db, uint(id))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = task.Delete(db)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	c.JSON(http.StatusOK, "deleted")
+}
