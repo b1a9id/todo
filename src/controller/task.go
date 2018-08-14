@@ -10,6 +10,7 @@ import (
 	"log"
 
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 )
 
 func TasksGET(c *gin.Context)  {
@@ -75,4 +76,36 @@ func TaskPOST(c *gin.Context) {
 	}
 
 	fmt.Printf("post sent. title %s", title)
+}
+
+func TaskPATCH(c *gin.Context) {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	// strconv.Atoiは文字列を10進数のint型に変換する
+	id, _ := strconv.Atoi(c.Param("id"))
+	task, err := model.TaskByID(db, uint(id))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	title := c.PostForm("title")
+	now := time.Now()
+
+	task.Title = title
+	task.UpdatedAt = now
+
+	err = task.Update(db)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	fmt.Println(task)
+	c.JSON(http.StatusOK, gin.H{"task": task})
 }
