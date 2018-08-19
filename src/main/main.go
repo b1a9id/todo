@@ -12,7 +12,8 @@ func main() {
 	s := router.PathPrefix("/api/v1").Subrouter()
 
 	s.HandleFunc("/tasks", controller.TaskGET).Methods("GET")
-	s.HandleFunc("/tasks", controller.TaskPost).Methods("POST")
+	s.HandleFunc("/tasks", controller.TaskPOST).Methods("POST")
+	s.HandleFunc("/tasks/{id}", controller.TaskPATCH).Methods("PATCH")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

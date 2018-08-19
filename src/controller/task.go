@@ -10,7 +10,9 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-	)
+	"strconv"
+	"github.com/gorilla/mux"
+)
 
 func TaskGET(w http.ResponseWriter, r *http.Request) {
 	dbDriver := "mysql"
@@ -58,7 +60,7 @@ func TaskGET(w http.ResponseWriter, r *http.Request) {
 	log.Println(r.URL.Path)
 }
 
-func TaskPost(w http.ResponseWriter, r *http.Request)  {
+func TaskPOST(w http.ResponseWriter, r *http.Request)  {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbName := "gwa"
@@ -80,6 +82,45 @@ func TaskPost(w http.ResponseWriter, r *http.Request)  {
 	err2 := task.Save(db)
 	if err2 != nil {
 		panic(err2.Error())
+	}
+
+	outputJson, err := json.Marshal(&task)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(outputJson))
+
+	log.Println(r.URL.Path)
+}
+
+func TaskPATCH(w http.ResponseWriter, r *http.Request)  {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	task, err := model.TaskByID(db, uint(id))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	title := r.PostFormValue("title")
+	now := time.Now()
+
+	task.Title = title
+	task.UpdatedAt = now
+
+	err = task.Update(db)
+	if err != nil {
+		panic(err.Error())
 	}
 
 	outputJson, err := json.Marshal(&task)
