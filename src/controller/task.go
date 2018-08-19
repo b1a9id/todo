@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	_ "github.com/go-sql-driver/mysql"
-)
+	)
 
 func TaskGET(w http.ResponseWriter, r *http.Request) {
 	dbDriver := "mysql"
@@ -48,6 +48,41 @@ func TaskGET(w http.ResponseWriter, r *http.Request) {
 	}
 
 	outputJson, err := json.Marshal(&tasks)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(outputJson))
+
+	log.Println(r.URL.Path)
+}
+
+func TaskPost(w http.ResponseWriter, r *http.Request)  {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	title := r.PostFormValue("title")
+	now := time.Now()
+
+	task := &model.Task{
+		Title: title,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	err2 := task.Save(db)
+	if err2 != nil {
+		panic(err2.Error())
+	}
+
+	outputJson, err := json.Marshal(&task)
 	if err != nil {
 		panic(err.Error())
 	}
