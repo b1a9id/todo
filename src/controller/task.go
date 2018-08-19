@@ -133,3 +133,28 @@ func TaskPATCH(w http.ResponseWriter, r *http.Request)  {
 
 	log.Println(r.URL.Path)
 }
+
+func TaskDELETE(w http.ResponseWriter, r *http.Request)  {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	vars := mux.Vars(r)
+	id, _ := strconv.Atoi(vars["id"])
+	task, err := model.TaskByID(db, uint(id))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	err = task.Delete(db)
+	if err != nil {
+		panic(err.Error())
+	}
+
+	log.Println(r.URL.Path)
+}

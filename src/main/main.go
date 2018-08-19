@@ -14,6 +14,7 @@ func main() {
 	s.HandleFunc("/tasks", controller.TaskGET).Methods("GET")
 	s.HandleFunc("/tasks", controller.TaskPOST).Methods("POST")
 	s.HandleFunc("/tasks/{id}", controller.TaskPATCH).Methods("PATCH")
+	s.HandleFunc("/tasks/{id}", controller.TaskDELETE).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
