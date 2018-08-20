@@ -9,6 +9,7 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
+	"strconv"
 )
 
 func TaskGET(c echo.Context) error {
@@ -70,6 +71,35 @@ func TaskPOST(c echo.Context) error {
 	err2 := task.Save(db)
 	if err2 != nil {
 		panic(err.Error())
+	}
+	return c.JSON(http.StatusOK, task)
+}
+
+func TaskPATCH(c echo.Context) error {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	task, err := model.TaskByID(db, uint(id))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	title := c.FormValue("title")
+	now := time.Now()
+
+	task.Title = title
+	task.UpdatedAt = now
+
+	err2 := task.Update(db)
+	if err != nil {
+		panic(err2.Error())
 	}
 	return c.JSON(http.StatusOK, task)
 }

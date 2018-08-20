@@ -10,6 +10,7 @@ func main() {
 
 	g.GET("/tasks", controller.TaskGET)
 	g.POST("/tasks", controller.TaskPOST)
+	g.PATCH("/tasks/:id", controller.TaskPATCH)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
