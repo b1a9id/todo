@@ -11,7 +11,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func IndexGET(c echo.Context) error {
+func TaskGET(c echo.Context) error {
 	dbDriver := "mysql"
 	dbUser := "root"
 	dbName := "gwa"
@@ -46,4 +46,30 @@ func IndexGET(c echo.Context) error {
 		tasks = append(tasks, task)
 	}
 	return c.JSON(http.StatusOK, tasks)
+}
+
+func TaskPOST(c echo.Context) error {
+	dbDriver := "mysql"
+	dbUser := "root"
+	dbName := "gwa"
+	dbOption := "?parseTime=true"
+	db, err := sql.Open(dbDriver, dbUser + "@/" + dbName + dbOption)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	title := c.FormValue("title")
+	now := time.Now()
+
+	task := &model.Task{
+		Title: title,
+		CreatedAt: now,
+		UpdatedAt: now,
+	}
+
+	err2 := task.Save(db)
+	if err2 != nil {
+		panic(err.Error())
+	}
+	return c.JSON(http.StatusOK, task)
 }

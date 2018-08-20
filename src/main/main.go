@@ -8,7 +8,8 @@ func main() {
 	e := echo.New()
 	g := e.Group("/api/v1")
 
-	g.GET("/tasks", controller.IndexGET)
+	g.GET("/tasks", controller.TaskGET)
+	g.POST("/tasks", controller.TaskPOST)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
